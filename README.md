@@ -1,6 +1,6 @@
-# Ioseva Custom build
+# Iosevka Custom build
 
-My Ioseka font custom build(s) as Nix flake.
+My Iosevka font custom build(s) as Nix flake.
 This build includes the quasi-proportional version as well as the webfont
 variants and complementary css files.
 
