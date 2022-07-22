@@ -24,19 +24,24 @@
                   # Replace `ttf::$pname with `contents::$pname` in buildPhase to get webfont aswell
                   # See https://typeof.net/Iosevka/customizer for more options
                   buildPhase = ''
-                    echo "exoprting"
                     export HOME=$TMPDIR
-                    echo "hook"
                     runHook preBuild
-                    echo "build"
-                    npm run build --no-update-notifier -- --jCmd=$NIX_BUILD_CORES contents::$pname 
-                    echo "post"
+                    npm run build --no-update-notifier -- --jCmd=$NIX_BUILD_CORES contents::$pname
                     runHook postBuild
-                    echo "end"
+                  '';
+
+                  # Override installPhase to copy the addional woff2 and css files
+                  installPhase = ''
+                    runHook preInstall
+                    fontdir="$out/share/fonts"
+                    mkdir -p "$fontdir"
+                    cp -r "dist/$pname"/* "$fontdir"
+                    runHook postInstall
                   '';
                 });
               in
               iosevkaWithWeb.override {
+                # Use https://typeof.net/Iosevka/customizer to generate build plan
                 privateBuildPlan = builtins.readFile ./iosevka-qp.toml;
                 set = "qp";
               };
