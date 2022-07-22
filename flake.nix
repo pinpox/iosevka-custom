@@ -43,6 +43,9 @@
               let
                 # Replace `ttf::$pname with `contents::$pname` in buildPhase to get webfont aswell
                 # See https://typeof.net/Iosevka/customizer for more options
+                # TODO when/if webfonts are included in nixpkgs iosevka pacakeg
+                # i.e. https://github.com/NixOS/nixpkgs/issues/182465 gets
+                # fixed
                 buildPhase = ''
                   export HOME=$TMPDIR
                   runHook preBuild
@@ -70,9 +73,15 @@
                   set = "qp";
                 };
 
-                iosevka-fixed = pkgs.iosevka.overrideAttrs (finalAttrs: previousAttrs: {
+                # TODO when/if webfonts are included in nixpkgs iosevka pacakeg
+                # i.e. https://github.com/NixOS/nixpkgs/issues/182465 gets
+                # fixed
+                iosevka-fixed = (pkgs.iosevka.overrideAttrs (finalAttrs: previousAttrs: {
                   inherit buildPhase installPhase;
-                });
+                })).override {
+                  privateBuildPlan = builtins.readFile ./iosevka-fixed.toml;
+                  set = "fixed";
+                };
 
                 # iosevka-fixed = (pkgs.iosevka.overrideAttrs (finalAttrs: previousAttrs: {
                 #   inherit buildPhase installPhase;
