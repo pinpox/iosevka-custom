@@ -1,0 +1,61 @@
+---
+kind: pipeline
+type: exec
+name: flake info
+
+platform:
+  os: linux
+  arch: amd64
+
+clone:
+  depth: 1
+
+steps:
+
+- name: show flake info
+  commands:
+  - nix --experimental-features "nix-command flakes" flake show
+  - nix --experimental-features "nix-command flakes" flake metadata
+
+- name: run flake checks
+  commands:
+  - nix --experimental-features "nix-command flakes" flake check --show-trace
+
+---
+kind: pipeline
+type: exec
+name: build amd64 flake apps
+
+platform:
+  os: linux
+  arch: amd64
+
+clone:
+  depth: 1
+
+steps:
+
+- name: Build iosevka-qp
+  commands:
+  - nix build .#iosevka-qp --out-link result-iosevka-qp
+  - nix path-info --closure-size -h $(readlink -f result-iosevka-qp)
+
+- name: Build iosevka-fixed
+  commands:
+  - nix build .#iosevka-fixed --out-link result-iosevka-fixed
+  - nix path-info --closure-size -h $(readlink -f result-iosevka-fixed)
+
+- name: upload to binary cache via s3
+  commands:
+  - nix run 'github:mayniklas/nixos'#s3uploader
+  environment:
+    AWS_ACCESS_KEY_ID:
+      from_secret: s3_secret_key
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: s3_access_key
+
+trigger:
+  branch:
+  - main
+  event:
+  - push
