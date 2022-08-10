@@ -98,7 +98,8 @@
     {
       packages = allSystems.packages;
       overlay = final: prev: {
-        iosevka-qp = allSystems.packages.${final.system}; # either `normal` or `nerd-font`
+        iosevka-qp = allSystems.packages.${final.system}.iosevka-qp;
+        iosevka-fixed = allSystems.packages.${final.system}.iosevka-fixed;
       };
     };
 }
